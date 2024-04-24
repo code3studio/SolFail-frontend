@@ -26,6 +26,15 @@ typography:{
         fontWeight:900,
        fontSize:"26px"
     },
+    body1:{
+        fontSize:"14px",
+        lineHeight:'24px',
+        fontWeight:400
+    },
+    body2:{
+        fontSize:"20px",
+        fontWeight: 700,
+    }
     
 },components:{
     MuiButton:{

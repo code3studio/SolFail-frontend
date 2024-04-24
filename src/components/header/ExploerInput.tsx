@@ -7,7 +7,7 @@ import { Box, Button, Grid, Typography } from "@mui/material";
 
 export default function ExplorerInput() {
   return (
-    <Box mt={3} my={1}>
+    <Box my={4}>
       <Typography variant="h6" color={"azure"}>
         Explorer Failed Transaction
       </Typography>
@@ -17,8 +17,8 @@ export default function ExplorerInput() {
             sx={{
               p: 1.2,
               bgcolor: "#ffffff4d",
-              backdropFilter:'blur(20px)',
-            //   width: "100%",
+              backdropFilter: "blur(20px)",
+              //   width: "100%",
               borderRadius: 3,
               border: "1px solid #00c59a",
               mt: 1,
@@ -30,7 +30,7 @@ export default function ExplorerInput() {
                 p: "2px 4px",
                 display: "flex",
                 alignItems: "center",
-              
+
                 // width: "100%",
                 // m:1.2
               }}
