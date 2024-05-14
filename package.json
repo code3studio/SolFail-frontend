@@ -10,12 +10,25 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@dynamic-labs/sdk-react-core": "^2.0.6",
+    "@dynamic-labs/solana": "^2.0.6",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
+    "@metaplex-foundation/js": "^0.20.1",
+    "@metaplex-foundation/mpl-candy-machine": "^6.0.1",
+    "@metaplex-foundation/mpl-token-metadata": "^3.2.1",
+    "@metaplex-foundation/umi": "^0.8.10",
     "@mui/icons-material": "^5.15.15",
     "@mui/material": "^5.15.15",
+    "@solana/web3.js": "^1.91.7",
+    "axios": "^1.6.8",
+    "bs58": "^5.0.0",
+    "i": "^0.3.7",
+    "npm": "^10.5.2",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.23.0",
+    "vite-plugin-node-polyfills": "^0.21.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",

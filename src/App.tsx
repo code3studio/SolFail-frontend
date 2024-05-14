@@ -1,26 +1,25 @@
 import "./App.css";
-import { Container, Grid, ThemeProvider } from "@mui/material";
-import Header from "./components/header/Header";
+import { ThemeProvider } from "@mui/material";
 import { theme } from "./theme";
-import Widget1 from "./components/widget1/Widget1";
-import Widget2 from "./components/widget2/Widget2";
-
+import { RouterProvider } from "react-router-dom";
+import { routers } from "./router/router";
+import React from "react";
+import { DynamicContextProvider } from "@dynamic-labs/sdk-react-core";
+import { SolanaWalletConnectors } from "@dynamic-labs/solana";
 function App() {
   return (
     <>
       <ThemeProvider theme={theme}>
-        <Header />
-        <Container maxWidth="xl">
-          <Widget1 />
-          <Grid container spacing={4} mt={4}>
-            <Grid item md={6}>
-              <Widget2 />
-            </Grid>
-            <Grid item md={6}>
-              <Widget2 />
-            </Grid>
-          </Grid>
-        </Container>
+        <DynamicContextProvider
+          settings={{
+            environmentId: "2962e077-c8af-435f-8ef2-84f883686227",
+            walletConnectors: [SolanaWalletConnectors],
+          }}
+        >
+          <React.Suspense fallback={<p>hello</p>}>
+            <RouterProvider router={routers} />
+          </React.Suspense>
+        </DynamicContextProvider>
       </ThemeProvider>
     </>
   );

@@ -5,7 +5,7 @@ type Props = {};
 
 const Widget1 = (_props: Props) => {
   return (
-    <Grid container spacing={4} mt={30}>
+    <Grid container spacing={4}>
       <Grid item md={3}>
         <CardItem />
       </Grid>
