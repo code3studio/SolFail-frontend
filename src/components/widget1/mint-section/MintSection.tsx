@@ -1,7 +1,17 @@
-import { Box, FormControlLabel, Paper, Radio, styled } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  Dialog,
+  FormControlLabel,
+  Paper,
+  Radio,
+  styled,
+} from "@mui/material";
 import { useState } from "react";
 import Mint from "./Mint";
 import Gift from "./Gift";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 type Props = {};
 
@@ -15,6 +25,7 @@ const Root = styled(Paper)(() => ({
 
 const MintSection = (_props: Props) => {
   const [mode, setMode] = useState<"mint" | "gift">("mint");
+  const [open, setOpen] = useState<boolean>(false);
   return (
     <Root>
       <FormControlLabel
@@ -30,9 +41,22 @@ const MintSection = (_props: Props) => {
         label="Gift"
       ></FormControlLabel>
       <Box alignContent={"center"}>
-        {mode === "mint" && <Mint />}
-        {mode === "gift" && <Gift />}
+        {mode === "mint" && <Mint handleClose={(e) => setOpen(e)} />}
+        {mode === "gift" && <Gift handleClose={(e) => setOpen(e)} />}
       </Box>
+      <Dialog
+        open={open}
+        PaperProps={{
+          sx: {
+            background: "transparent",
+            boxShadow: "none",
+            overflow: "hidden",
+          },
+        }}
+      >
+        <CircularProgress />
+      </Dialog>
+      <ToastContainer />
     </Root>
   );
 };

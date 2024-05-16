@@ -22,12 +22,15 @@ import { Metaplex, PublicKey, keypairIdentity } from "@metaplex-foundation/js";
 import axios from "axios";
 import { MetadataType } from "../../../type";
 import NFTDialog from "./NFTDialog";
+import { toast } from "react-toastify";
 
-type Props = {};
+type Props = {
+  handleClose: (e: boolean) => void;
+};
 const CountText = styled(TextField)(() => ({
   width: "16ch",
 }));
-const Gift = (_props: Props) => {
+const Gift = ({ handleClose }: Props) => {
   const [count, setCount] = useState<number>(0);
   const [address, setAddress] = useState<string>("");
   const [met, setMet] = useState<MetadataType[] | []>([]);
@@ -42,6 +45,7 @@ const Gift = (_props: Props) => {
   const handleGift = async () => {
     try {
       if (!wallet.publicKey) return;
+      handleClose(true);
       const SOLANA_CONNECTION = new Connection(QUICKNODE_RPC);
       const WALLET = Keypair.fromSecretKey(new Uint8Array(secret));
       console.log("wallet==", WALLET.publicKey.toBase58());
@@ -121,6 +125,7 @@ const Gift = (_props: Props) => {
           })
           .catch((error) => {
             console.log(`Error minting NFT ${i + 1}:`, error);
+            throw new Error(error);
           })
       );
 
@@ -130,7 +135,11 @@ const Gift = (_props: Props) => {
       console.log("Finished minting all NFTs.");
       setOpen(true);
     } catch (error) {
+      //@ts-ignore
+      toast(error.message);
       console.log("error==", error);
+    } finally {
+      handleClose(false);
     }
   };
 

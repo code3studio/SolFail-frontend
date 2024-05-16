@@ -22,8 +22,11 @@ import { Metaplex, PublicKey, keypairIdentity } from "@metaplex-foundation/js";
 import { useWallet } from "@solana/wallet-adapter-react";
 import NFTDialog from "./NFTDialog";
 import { MetadataType } from "../../../type";
+import { toast } from "react-toastify";
 
-type Props = {};
+type Props = {
+  handleClose: (e: boolean) => void;
+};
 
 const CountText = styled(TextField)(() => ({
   width: "16ch",
@@ -36,7 +39,7 @@ const secret = [
   148, 251, 123, 115, 191, 129, 24, 99, 200, 72, 8, 202, 5,
 ];
 
-const Mint = (_props: Props) => {
+const Mint = ({ handleClose }: Props) => {
   const wallet = useWallet();
   console.log("wallet==", wallet);
 
@@ -47,6 +50,7 @@ const Mint = (_props: Props) => {
   const handleMint = async () => {
     try {
       if (!wallet.publicKey) return;
+      handleClose(true);
       const SOLANA_CONNECTION = new Connection(QUICKNODE_RPC, {
         commitment: "confirmed",
       });
@@ -128,6 +132,7 @@ const Mint = (_props: Props) => {
           })
           .catch((error) => {
             console.log(`Error minting NFT ${i + 1}:`, error);
+            throw new Error(error);
           })
       );
 
@@ -138,6 +143,10 @@ const Mint = (_props: Props) => {
       setOpen(true);
     } catch (error) {
       console.log("error==", error);
+      //@ts-ignore
+      toast(error.message);
+    } finally {
+      handleClose(false);
     }
   };
 
