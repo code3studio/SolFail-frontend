@@ -15,8 +15,8 @@ import {
   Connection,
   Keypair,
   LAMPORTS_PER_SOL,
-  SystemProgram,
-  Transaction,
+  // SystemProgram,
+  // Transaction,
 } from "@solana/web3.js";
 import { Metaplex, PublicKey, keypairIdentity } from "@metaplex-foundation/js";
 import axios from "axios";
@@ -54,9 +54,9 @@ const Gift = ({ handleClose }: Props) => {
       );
 
       const MINT_PRICE_LAMPORTS = 0.1 * LAMPORTS_PER_SOL; // 1 SOL
-      const PAYMENT_RECEIVER = new PublicKey(
-        "GdxLvb63NkKpg6Zgmt4UEwZrNpZuBPPRSiCNY6bcjt9w"
-      );
+      // const PAYMENT_RECEIVER = new PublicKey(
+      //   "GdxLvb63NkKpg6Zgmt4UEwZrNpZuBPPRSiCNY6bcjt9w"
+      // );
 
       // Check if the user has enough SOL to mint
       const userBalance = await SOLANA_CONNECTION.getBalance(wallet.publicKey);
@@ -64,21 +64,21 @@ const Gift = ({ handleClose }: Props) => {
         throw new Error("Insufficient balance to mint NFT.");
       }
 
-      // Send SOL to payment receiver
-      const transaction = new Transaction().add(
-        SystemProgram.transfer({
-          fromPubkey: wallet.publicKey,
-          toPubkey: PAYMENT_RECEIVER,
-          lamports: MINT_PRICE_LAMPORTS,
-        })
-      );
+      // // Send SOL to payment receiver
+      // const transaction = new Transaction().add(
+      //   SystemProgram.transfer({
+      //     fromPubkey: wallet.publicKey,
+      //     toPubkey: PAYMENT_RECEIVER,
+      //     lamports: MINT_PRICE_LAMPORTS,
+      //   })
+      // );
 
-      const signature = await wallet.sendTransaction(
-        transaction,
-        SOLANA_CONNECTION
-      );
-      await SOLANA_CONNECTION.confirmTransaction(signature);
-      console.log("Payment transaction signature", signature);
+      // const signature = await wallet.sendTransaction(
+      //   transaction,
+      //   SOLANA_CONNECTION
+      // );
+      // await SOLANA_CONNECTION.confirmTransaction(signature);
+      // console.log("Payment transaction signature", signature);
 
       // Mint the NFT to the user's wallet
       const res = await axios.get(
@@ -87,7 +87,6 @@ const Gift = ({ handleClose }: Props) => {
       console.log("res==", res.data);
 
       // Use Promise.all to mint NFTs concurrently
-      let metadata: MetadataType[] | [] = [];
       //@ts-ignore
       const mintPromises = res.data.map((data, i) =>
         METAPLEX.nfts()
@@ -118,10 +117,10 @@ const Gift = ({ handleClose }: Props) => {
               `Minted NFT: https://explorer.solana.com/address/${nft.address}?cluster=devnet`
             );
             console.log("nft==", nft);
-            axios.get(nft.uri).then((res) => {
-              //@ts-ignore
-              metadata.push({ ...res.data, address: nft.address });
-            });
+            return axios.get(nft.uri).then((res) => ({
+              ...res.data,
+              address: nft.address,
+            }));
           })
           .catch((error) => {
             console.log(`Error minting NFT ${i + 1}:`, error);
@@ -129,11 +128,12 @@ const Gift = ({ handleClose }: Props) => {
           })
       );
 
-      await Promise.all(mintPromises);
+      const metadata = await Promise.all(mintPromises);
+      console.log("metadata===", metadata);
 
-      setMet(metadata as any);
-      console.log("Finished minting all NFTs.");
+      setMet([...metadata]);
       setOpen(true);
+      console.log("Finished minting all NFTs.");
     } catch (error) {
       //@ts-ignore
       toast(error.message);

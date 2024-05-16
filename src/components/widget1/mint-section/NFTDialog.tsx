@@ -21,6 +21,7 @@ type Props = {
 
 const NFTDialog = ({ data, gift, open, handleClose }: Props) => {
   const [expanded, setExpanded] = React.useState<number>(0);
+  console.log("data==", data);
 
   const handleChange =
     (panel: number) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
@@ -43,20 +44,21 @@ const NFTDialog = ({ data, gift, open, handleClose }: Props) => {
       PaperProps={{ sx: { p: 3 } }}
       onClose={() => handleClose(false)}
     >
-      <DialogTitle>
-        {gift ? (
-          <Typography variant="subtitle1">
-            You minted {data.length} FailSol NFT and sent to{" "}
-            {abbreviateString(gift)}
-          </Typography>
-        ) : (
-          <Typography variant="h5">
-            You minted {data.length} FailSol NFT
-          </Typography>
-        )}
+      <DialogTitle sx={{ fontWeight: 100, fontSize: "16px" }}>
+        {gift
+          ? // <Typography variant="subtitle1">
+            ` You minted ${data.length} FailSol NFT and sent to
+            ${abbreviateString(gift)}`
+          : // </Typography>
+            // <Typography variant="subtitle1">
+            ` You minted ${data.length} FailSol NFT`}
       </DialogTitle>
       {data.map((item, index) => (
-        <Accordion expanded={expanded === index} onChange={handleChange(index)}>
+        <Accordion
+          expanded={expanded === index}
+          onChange={handleChange(index)}
+          key={index}
+        >
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
             aria-controls="panel1-content"

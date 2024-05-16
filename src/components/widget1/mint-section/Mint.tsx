@@ -41,7 +41,6 @@ const secret = [
 
 const Mint = ({ handleClose }: Props) => {
   const wallet = useWallet();
-  console.log("wallet==", wallet);
 
   const [count, setCount] = useState<number>(0);
   const [met, setMet] = useState<MetadataType[] | []>([]);
@@ -55,7 +54,6 @@ const Mint = ({ handleClose }: Props) => {
         commitment: "confirmed",
       });
       const WALLET = Keypair.fromSecretKey(new Uint8Array(secret));
-      console.log("wallet==", WALLET.publicKey.toBase58());
       const METAPLEX = Metaplex.make(SOLANA_CONNECTION).use(
         keypairIdentity(WALLET)
       );
@@ -94,8 +92,9 @@ const Mint = ({ handleClose }: Props) => {
       console.log("res==", res.data);
 
       // Use Promise.all to mint NFTs concurrently
-      let metadata: MetadataType[] | [] = [];
       //@ts-ignore
+      // Use Promise.all to mint NFTs concurrently
+      // let metadata: MetadataType[] | [] = [];
       const mintPromises = res.data.map((data, i) =>
         METAPLEX.nfts()
           .create(
@@ -125,10 +124,10 @@ const Mint = ({ handleClose }: Props) => {
               `Minted NFT: https://explorer.solana.com/address/${nft.address}?cluster=devnet`
             );
             console.log("nft==", nft);
-            axios.get(nft.uri).then((res) => {
-              //@ts-ignore
-              metadata.push({ ...res.data, address: nft.address });
-            });
+            return axios.get(nft.uri).then((res) => ({
+              ...res.data,
+              address: nft.address,
+            }));
           })
           .catch((error) => {
             console.log(`Error minting NFT ${i + 1}:`, error);
@@ -136,11 +135,12 @@ const Mint = ({ handleClose }: Props) => {
           })
       );
 
-      await Promise.all(mintPromises);
+      const metadata = await Promise.all(mintPromises);
+      console.log("metadata===", metadata);
 
-      setMet(metadata as any);
-      console.log("Finished minting all NFTs.");
+      setMet([...metadata]);
       setOpen(true);
+      console.log("Finished minting all NFTs.");
     } catch (error) {
       console.log("error==", error);
       //@ts-ignore
@@ -149,6 +149,7 @@ const Mint = ({ handleClose }: Props) => {
       handleClose(false);
     }
   };
+  console.log("met==", met);
 
   return (
     <>
@@ -231,6 +232,7 @@ const Mint = ({ handleClose }: Props) => {
           />
         ))}
       </Grid>
+
       <NFTDialog data={met} open={open} handleClose={(_e) => setOpen(false)} />
     </>
   );
