@@ -80,12 +80,12 @@ const Mint = ({ handleClose }: Props) => {
         })
       );
 
-      const signature = await wallet.sendTransaction(
-        transaction,
-        SOLANA_CONNECTION
-      );
-      await SOLANA_CONNECTION.confirmTransaction(signature);
-      console.log("Payment transaction signature", signature);
+      // const signature = await wallet.sendTransaction(
+      //   transaction,
+      //   SOLANA_CONNECTION
+      // );
+      // await SOLANA_CONNECTION.confirmTransaction(signature, "finalized");
+      // console.log("Payment transaction signature", signature);
 
       // Mint the NFT to the user's wallet
       const res = await axios.get(
