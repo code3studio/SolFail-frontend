@@ -21,7 +21,7 @@ export const theme = createTheme({
     },
   },
   typography: {
-    caption: { fontWeight: 900 },
+    caption: { fontSize: "12px" },
     h6: {
       fontWeight: 900,
       fontSize: "26px",

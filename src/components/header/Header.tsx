@@ -1,6 +1,6 @@
 import {
   Box,
-  Button,
+  // Button,
   Container,
   Divider,
   Grid,
@@ -10,7 +10,7 @@ import {
 import ExplorerInput from "./ExploerInput";
 import solLogo from "../../assets/solPriceLogo.webp";
 import { Link } from "react-router-dom";
-
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 type Props = {};
 
 const RootHeader = styled(Box)(({}) => ({
@@ -46,11 +46,12 @@ const Header = (_props: Props) => {
                   bgcolor: "#ffffff33",
                   borderRadius: 2,
                   backdropFilter: "blue(15px)",
-                  display: "flex",
+                  // display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
                   ml: 4,
                   px: 2,
+                  display: { xs: "none", md: "flex" },
                 }}
               >
                 <img src={solLogo} width={20} />
@@ -69,7 +70,7 @@ const Header = (_props: Props) => {
           </Grid>
           <Grid item>
             <Grid container>
-              <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
+              {/* <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
                 <Button
                   LinkComponent={"a"}
                   href="/mint"
@@ -77,10 +78,11 @@ const Header = (_props: Props) => {
                 >
                   mint
                 </Button>
-              </Box>
-              <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
+              </Box> */}
+              <WalletMultiButton />
+              {/* <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
                 <Button sx={{ color: "white", display: "block" }}>mint</Button>
-              </Box>
+              </Box> */}
             </Grid>
           </Grid>
         </Grid>
