@@ -5,7 +5,7 @@ import Show2 from "../../../assets/showcase/2.png";
 import Show3 from "../../../assets/showcase/3.png";
 import Show4 from "../../../assets/showcase/4.png";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay } from "swiper/modules";
+import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/effect-fade";
 
@@ -29,11 +29,13 @@ const ShowSection = (_props: Props) => {
   return (
     <Root>
       <Swiper
+        pagination={{ clickable: true }}
         breakpoints={{
           320: {
             slidesPerView: 1,
           },
         }}
+        navigation={true}
         autoplay={{
           delay: 2500,
           disableOnInteraction: false,
@@ -41,7 +43,7 @@ const ShowSection = (_props: Props) => {
         // style={{ display: "flex", justifyContent: "center" }}
         // spaceBetween={50}
         slidesPerView={1}
-        modules={[Autoplay]}
+        modules={[Autoplay, Pagination, Navigation]}
         // effect="fade"
 
         // onSlideChange={() => console.log("slide change")}

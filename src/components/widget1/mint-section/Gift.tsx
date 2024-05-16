@@ -9,6 +9,19 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import SolLogo from "../../../assets/solPriceLogo.webp";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { METADATA_URL, QUICKNODE_RPC } from "../../../constant";
+import {
+  Connection,
+  Keypair,
+  LAMPORTS_PER_SOL,
+  SystemProgram,
+  Transaction,
+} from "@solana/web3.js";
+import { Metaplex, PublicKey, keypairIdentity } from "@metaplex-foundation/js";
+import axios from "axios";
+import { MetadataType } from "../../../type";
+import NFTDialog from "./NFTDialog";
 
 type Props = {};
 const CountText = styled(TextField)(() => ({
@@ -17,6 +30,109 @@ const CountText = styled(TextField)(() => ({
 const Gift = (_props: Props) => {
   const [count, setCount] = useState<number>(0);
   const [address, setAddress] = useState<string>("");
+  const [met, setMet] = useState<MetadataType[] | []>([]);
+  const [open, setOpen] = useState<boolean>(false);
+  const wallet = useWallet();
+  const secret = [
+    4, 203, 170, 140, 52, 111, 194, 79, 184, 206, 170, 25, 182, 108, 154, 75,
+    251, 39, 109, 71, 204, 249, 137, 240, 47, 92, 5, 61, 247, 48, 183, 151, 152,
+    91, 68, 24, 87, 160, 224, 30, 240, 38, 70, 237, 131, 147, 128, 232, 21, 89,
+    248, 148, 251, 123, 115, 191, 129, 24, 99, 200, 72, 8, 202, 5,
+  ];
+  const handleGift = async () => {
+    try {
+      if (!wallet.publicKey) return;
+      const SOLANA_CONNECTION = new Connection(QUICKNODE_RPC);
+      const WALLET = Keypair.fromSecretKey(new Uint8Array(secret));
+      console.log("wallet==", WALLET.publicKey.toBase58());
+      const METAPLEX = Metaplex.make(SOLANA_CONNECTION).use(
+        keypairIdentity(WALLET)
+      );
+
+      const MINT_PRICE_LAMPORTS = 0.1 * LAMPORTS_PER_SOL; // 1 SOL
+      const PAYMENT_RECEIVER = new PublicKey(
+        "GdxLvb63NkKpg6Zgmt4UEwZrNpZuBPPRSiCNY6bcjt9w"
+      );
+
+      // Check if the user has enough SOL to mint
+      const userBalance = await SOLANA_CONNECTION.getBalance(wallet.publicKey);
+      if (userBalance < MINT_PRICE_LAMPORTS) {
+        throw new Error("Insufficient balance to mint NFT.");
+      }
+
+      // Send SOL to payment receiver
+      const transaction = new Transaction().add(
+        SystemProgram.transfer({
+          fromPubkey: wallet.publicKey,
+          toPubkey: PAYMENT_RECEIVER,
+          lamports: MINT_PRICE_LAMPORTS,
+        })
+      );
+
+      const signature = await wallet.sendTransaction(
+        transaction,
+        SOLANA_CONNECTION
+      );
+      await SOLANA_CONNECTION.confirmTransaction(signature);
+      console.log("Payment transaction signature", signature);
+
+      // Mint the NFT to the user's wallet
+      const res = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/signature/${count}`
+      );
+      console.log("res==", res.data);
+
+      // Use Promise.all to mint NFTs concurrently
+      let metadata: MetadataType[] | [] = [];
+      //@ts-ignore
+      const mintPromises = res.data.map((data, i) =>
+        METAPLEX.nfts()
+          .create(
+            {
+              uri: `${METADATA_URL}${data.hash}`,
+              name: `FailSol ${i + 1}`,
+              sellerFeeBasisPoints: 500,
+              symbol: "FAIL",
+              creators: [
+                { address: WALLET.publicKey, share: 80 },
+                {
+                  address: new PublicKey(
+                    "DxqA9eeszbpVgYAfESrUMWC7Jur4kX7ZCQjMPjFKFJ57"
+                  ),
+                  share: 20,
+                },
+              ],
+              isMutable: false,
+              //@ts-ignore
+              tokenOwner: address ? new PublicKey(address) : wallet.publicKey,
+            },
+            { commitment: "finalized" }
+          )
+          .then(({ nft }) => {
+            console.log(`Success!🎉 NFT ${i + 1}`);
+            console.log(
+              `Minted NFT: https://explorer.solana.com/address/${nft.address}?cluster=devnet`
+            );
+            console.log("nft==", nft);
+            axios.get(nft.uri).then((res) => {
+              //@ts-ignore
+              metadata.push({ ...res.data, address: nft.address });
+            });
+          })
+          .catch((error) => {
+            console.log(`Error minting NFT ${i + 1}:`, error);
+          })
+      );
+
+      await Promise.all(mintPromises);
+
+      setMet(metadata as any);
+      console.log("Finished minting all NFTs.");
+      setOpen(true);
+    } catch (error) {
+      console.log("error==", error);
+    }
+  };
 
   return (
     <>
@@ -79,7 +195,11 @@ const Gift = (_props: Props) => {
           </Grid>
         </Grid>
         <Grid item>
-          <Button variant="contained" sx={{ float: "right" }}>
+          <Button
+            variant="contained"
+            onClick={handleGift}
+            sx={{ float: "right" }}
+          >
             {" "}
             <img
               src={SolLogo}
@@ -100,6 +220,12 @@ const Gift = (_props: Props) => {
           ))}
         </Grid>
       </Grid>
+      <NFTDialog
+        data={met}
+        gift={address}
+        handleClose={() => setOpen(false)}
+        open={open}
+      />
     </>
   );
 };
