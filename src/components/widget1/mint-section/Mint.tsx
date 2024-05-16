@@ -13,8 +13,8 @@ import {
   Connection,
   Keypair,
   LAMPORTS_PER_SOL,
-  SystemProgram,
-  Transaction,
+  // SystemProgram,
+  // Transaction,
 } from "@solana/web3.js";
 import { METADATA_URL, QUICKNODE_RPC } from "../../../constant";
 import axios from "axios";
@@ -61,9 +61,9 @@ const Mint = ({ handleClose }: Props) => {
       );
 
       const MINT_PRICE_LAMPORTS = 0.1 * LAMPORTS_PER_SOL; // 1 SOL
-      const PAYMENT_RECEIVER = new PublicKey(
-        "GdxLvb63NkKpg6Zgmt4UEwZrNpZuBPPRSiCNY6bcjt9w"
-      );
+      // const PAYMENT_RECEIVER = new PublicKey(
+      //   "GdxLvb63NkKpg6Zgmt4UEwZrNpZuBPPRSiCNY6bcjt9w"
+      // );
 
       // Check if the user has enough SOL to mint
       const userBalance = await SOLANA_CONNECTION.getBalance(wallet.publicKey);
@@ -72,13 +72,13 @@ const Mint = ({ handleClose }: Props) => {
       }
 
       // Send SOL to payment receiver
-      const transaction = new Transaction().add(
-        SystemProgram.transfer({
-          fromPubkey: wallet.publicKey,
-          toPubkey: PAYMENT_RECEIVER,
-          lamports: MINT_PRICE_LAMPORTS,
-        })
-      );
+      // const transaction = new Transaction().add(
+      //   SystemProgram.transfer({
+      //     fromPubkey: wallet.publicKey,
+      //     toPubkey: PAYMENT_RECEIVER,
+      //     lamports: MINT_PRICE_LAMPORTS,
+      //   })
+      // );
 
       // const signature = await wallet.sendTransaction(
       //   transaction,
