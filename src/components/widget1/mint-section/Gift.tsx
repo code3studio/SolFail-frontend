@@ -23,6 +23,7 @@ import axios from "axios";
 import { MetadataType } from "../../../type";
 import NFTDialog from "./NFTDialog";
 import { toast } from "react-toastify";
+import CloseIcon from "@mui/icons-material/Close";
 
 type Props = {
   handleClose: (e: boolean) => void;
@@ -35,6 +36,7 @@ const Gift = ({ handleClose }: Props) => {
   const [address, setAddress] = useState<string>("");
   const [met, setMet] = useState<MetadataType[] | []>([]);
   const [open, setOpen] = useState<boolean>(false);
+  const [signature, setSignature] = useState<string>("");
   const wallet = useWallet();
   const secret = [
     4, 203, 170, 140, 52, 111, 194, 79, 184, 206, 170, 25, 182, 108, 154, 75,
@@ -81,9 +83,16 @@ const Gift = ({ handleClose }: Props) => {
       // console.log("Payment transaction signature", signature);
 
       // Mint the NFT to the user's wallet
-      const res = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/signature/${count}`
-      );
+      let res;
+      if (signature) {
+        res = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/sp_signature/${signature}`
+        );
+      } else {
+        res = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/signature/${count}`
+        );
+      }
       console.log("res==", res.data);
 
       // Use Promise.all to mint NFTs concurrently
@@ -135,9 +144,15 @@ const Gift = ({ handleClose }: Props) => {
       setOpen(true);
       console.log("Finished minting all NFTs.");
     } catch (error) {
-      //@ts-ignore
-      toast(error.message);
       console.log("error==", error);
+      //@ts-ignore
+      if (error.response.data) {
+        //@ts-ignore
+        toast(error.response.data);
+      } else {
+        //@ts-ignore
+        toast(error.message);
+      }
     } finally {
       handleClose(false);
     }
@@ -146,6 +161,26 @@ const Gift = ({ handleClose }: Props) => {
   return (
     <>
       <Grid container justifyContent={"center"}>
+        <Grid item md={8} sm={12} xs={12}>
+          <TextField
+            helperText="you can mint the NFT with signature you wanted"
+            fullWidth
+            placeholder="signature"
+            value={signature}
+            onChange={(e) => setSignature(e.target.value)}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton size="small" onClick={() => setSignature("")}>
+                    <CloseIcon />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Grid>
+      </Grid>
+      <Grid container justifyContent={"center"} mt={2}>
         <Grid item md={6}>
           <TextField
             value={address}
@@ -166,6 +201,7 @@ const Gift = ({ handleClose }: Props) => {
           <Grid container flexDirection={"column"}>
             <CountText
               //   fullWidth
+              disabled={signature !== ""}
               type="number"
               value={count}
               onChange={(e) => {
@@ -175,6 +211,7 @@ const Gift = ({ handleClose }: Props) => {
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton
+                      disabled={signature !== ""}
                       size="small"
                       onClick={() => {
                         setCount(count + 1);
@@ -189,6 +226,7 @@ const Gift = ({ handleClose }: Props) => {
                   <InputAdornment position="start">
                     {" "}
                     <IconButton
+                      disabled={signature !== ""}
                       size="small"
                       onClick={() => {
                         setCount(count - 1);

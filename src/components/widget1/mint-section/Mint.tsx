@@ -23,7 +23,7 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import NFTDialog from "./NFTDialog";
 import { MetadataType } from "../../../type";
 import { toast } from "react-toastify";
-
+import CloseIcon from "@mui/icons-material/Close";
 type Props = {
   handleClose: (e: boolean) => void;
 };
@@ -45,6 +45,7 @@ const Mint = ({ handleClose }: Props) => {
   const [count, setCount] = useState<number>(0);
   const [met, setMet] = useState<MetadataType[] | []>([]);
   const [open, setOpen] = useState<boolean>(false);
+  const [signature, setSignature] = useState<string>("");
 
   const handleMint = async () => {
     try {
@@ -86,9 +87,16 @@ const Mint = ({ handleClose }: Props) => {
       // console.log("Payment transaction signature", signature);
 
       // Mint the NFT to the user's wallet
-      const res = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/signature/${count}`
-      );
+      let res;
+      if (signature) {
+        res = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/sp_signature/${signature}`
+        );
+      } else {
+        res = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/signature/${count}`
+        );
+      }
       console.log("res==", res.data);
 
       // Use Promise.all to mint NFTs concurrently
@@ -144,7 +152,13 @@ const Mint = ({ handleClose }: Props) => {
     } catch (error) {
       console.log("error==", error);
       //@ts-ignore
-      toast(error.message);
+      if (error.response.data) {
+        //@ts-ignore
+        toast(error.response.data);
+      } else {
+        //@ts-ignore
+        toast(error.message);
+      }
     } finally {
       handleClose(false);
     }
@@ -153,15 +167,37 @@ const Mint = ({ handleClose }: Props) => {
 
   return (
     <>
+      <Grid container justifyContent={"center"} mt={2}>
+        {/*TODO: validation for signature*/}
+        <Grid item md={8} sm={12} xs={12}>
+          <TextField
+            helperText="you can mint the NFT with signature you wanted"
+            fullWidth
+            placeholder="signature"
+            value={signature}
+            onChange={(e) => setSignature(e.target.value)}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton size="small" onClick={() => setSignature("")}>
+                    <CloseIcon />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Grid>
+      </Grid>
       <Grid
         container
         justifyContent={"space-around"}
         alignItems={"center"}
-        mt={4}
+        mt={2}
       >
         <Grid item>
           <Grid container flexDirection={"column"}>
             <CountText
+              disabled={signature !== ""}
               //   fullWidth
               type="number"
               value={count}
@@ -177,6 +213,7 @@ const Mint = ({ handleClose }: Props) => {
                         setCount(count + 1);
                       }}
                       color="primary"
+                      disabled={signature !== ""}
                     >
                       +
                     </IconButton>
@@ -191,6 +228,7 @@ const Mint = ({ handleClose }: Props) => {
                         setCount(count - 1);
                       }}
                       color="primary"
+                      disabled={signature !== ""}
                     >
                       -
                     </IconButton>
