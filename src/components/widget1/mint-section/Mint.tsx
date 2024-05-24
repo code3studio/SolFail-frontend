@@ -108,7 +108,7 @@ const Mint = ({ handleClose }: Props) => {
           .create(
             {
               uri: `${METADATA_URL}${data.hash}`,
-              name: `FailSol ${i + 1}`,
+              name: `FailSol ${data.number}`,
               sellerFeeBasisPoints: 500,
               symbol: "FAIL",
               creators: [
@@ -163,7 +163,6 @@ const Mint = ({ handleClose }: Props) => {
       handleClose(false);
     }
   };
-  console.log("met==", met);
 
   return (
     <>

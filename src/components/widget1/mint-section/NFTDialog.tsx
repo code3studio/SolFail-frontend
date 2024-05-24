@@ -21,7 +21,6 @@ type Props = {
 
 const NFTDialog = ({ data, gift, open, handleClose }: Props) => {
   const [expanded, setExpanded] = React.useState<number>(0);
-  console.log("data==", data);
 
   const handleChange =
     (panel: number) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
