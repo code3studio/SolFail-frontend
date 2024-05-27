@@ -90,11 +90,21 @@ const Mint = ({ handleClose }: Props) => {
       let res;
       if (signature) {
         res = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/sp_signature/${signature}`
+          `${import.meta.env.VITE_BACKEND_URL}/sp_signature/${signature}`,
+          {
+            params: {
+              address: wallet.publicKey.toBase58(),
+            },
+          }
         );
       } else {
         res = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/signature/${count}`
+          `${import.meta.env.VITE_BACKEND_URL}/signature/${count}`,
+          {
+            params: {
+              address: wallet.publicKey.toBase58(),
+            },
+          }
         );
       }
       console.log("res==", res.data);
@@ -103,8 +113,9 @@ const Mint = ({ handleClose }: Props) => {
       //@ts-ignore
       // Use Promise.all to mint NFTs concurrently
       // let metadata: MetadataType[] | [] = [];
-      const mintPromises = res.data.map((data, i) =>
-        METAPLEX.nfts()
+
+      const mintPromises = res.data.map((data: any, i) => {
+        return METAPLEX.nfts()
           .create(
             {
               uri: `${METADATA_URL}${data.hash}`,
@@ -140,14 +151,28 @@ const Mint = ({ handleClose }: Props) => {
           .catch((error) => {
             console.log(`Error minting NFT ${i + 1}:`, error);
             throw new Error(error);
-          })
-      );
+          });
+      });
 
-      const metadata = await Promise.all(mintPromises);
+      const metadata: MetadataType[] = await Promise.all(mintPromises);
       console.log("metadata===", metadata);
 
       setMet([...metadata]);
+      let payload: any = [];
+      metadata.map((item, index) => {
+        payload.push({
+          imgUrl: item.image,
+          signature: res.data[index].signature,
+        });
+      });
       setOpen(true);
+      if (payload.length > 0) {
+        const response = await axios.post(
+          `${import.meta.env.VITE_BACKEND_URL}/created`,
+          payload
+        );
+        console.log("response==", response);
+      }
       console.log("Finished minting all NFTs.");
     } catch (error) {
       console.log("error==", error);

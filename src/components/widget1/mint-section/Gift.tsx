@@ -86,11 +86,21 @@ const Gift = ({ handleClose }: Props) => {
       let res;
       if (signature) {
         res = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/sp_signature/${signature}`
+          `${import.meta.env.VITE_BACKEND_URL}/sp_signature/${signature}`,
+          {
+            params: {
+              address: wallet.publicKey.toBase58(),
+            },
+          }
         );
       } else {
         res = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/signature/${count}`
+          `${import.meta.env.VITE_BACKEND_URL}/signature/${count}`,
+          {
+            params: {
+              address: wallet.publicKey.toBase58(),
+            },
+          }
         );
       }
       console.log("res==", res.data);
@@ -141,7 +151,21 @@ const Gift = ({ handleClose }: Props) => {
       console.log("metadata===", metadata);
 
       setMet([...metadata]);
+      let payload: any = [];
+      metadata.map((item, index) => {
+        payload.push({
+          imgUrl: item.image,
+          signature: res.data[index].signature,
+        });
+      });
       setOpen(true);
+      if (payload.length > 0) {
+        const response = await axios.post(
+          `${import.meta.env.VITE_BACKEND_URL}/created`,
+          payload
+        );
+        console.log("response==", response);
+      }
       console.log("Finished minting all NFTs.");
     } catch (error) {
       console.log("error==", error);

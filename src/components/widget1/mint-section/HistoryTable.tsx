@@ -1,3 +1,6 @@
+import { useState, useEffect, useCallback } from "react";
+import axios from "axios";
+import { formatDistanceToNow } from "date-fns";
 import { styled } from "@mui/material/styles";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -7,6 +10,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { Typography } from "@mui/material";
+import { useWebSocket } from "../../../providers/WebSocketProvider";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -23,7 +27,6 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
     backgroundColor: theme.palette.action.hover,
   },
-  // hide last border
   "&:last-child td, &:last-child th": {
     border: 0,
   },
@@ -35,48 +38,93 @@ const AddressCell = styled("div")(({ theme }) => ({
   whiteSpace: "nowrap",
   width: "100%",
   [theme.breakpoints.down("sm")]: {
-    maxWidth: "100px", // Adjust this width as needed
+    maxWidth: "100px", // Adjust this width as needed for small screens
+  },
+  [theme.breakpoints.up("sm")]: {
+    maxWidth: "200px", // Adjust this width as needed for larger screens
   },
 }));
 
-const histories = [
-  {
-    address: "BFjgoGvjkMcFuPPvpDLJHwKTSMneaP3nNsz1uCbz69RW",
-    count: 2,
-    timestamp: "2024-05-16",
-  },
-  {
-    address: "BFjgoGvjkMcFuPPvpDLJHwKTSMneaP3nNsz1uCbz69RW",
-    count: 2,
-    timestamp: "2024-05-16",
-  },
-  {
-    address: "BFjgoGvjkMcFuPPvpDLJHwKTSMneaP3nNsz1uCbz69RW",
-    count: 2,
-    timestamp: "2024-05-16",
-  },
-  {
-    address: "BFjgoGvjkMcFuPPvpDLJHwKTSMneaP3nNsz1uCbz69RW",
-    count: 2,
-    timestamp: "2024-05-16",
-  },
-  {
-    address: "BFjgoGvjkMcFuPPvpDLJHwKTSMneaP3nNsz1uCbz69RW",
-    count: 2,
-    timestamp: "2024-05-16",
-  },
-  // Add more data as needed
-];
+export type HistoryType = {
+  address: string;
+  signature: string;
+  timestamp: string;
+};
 
 export default function TxTable() {
+  const [histories, setHistories] = useState<HistoryType[]>([]);
+  const [page, setPage] = useState<number>(1);
+  const [fetchList, setFetchList] = useState<HistoryType[] | []>([
+    { address: "", signature: "", timestamp: "" },
+  ]);
+  const [loading, setLoading] = useState(false);
+  const { messages } = useWebSocket();
+
+  const fetchHistories = useCallback(async (page: number) => {
+    setLoading(true);
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/get_histories`,
+        {
+          params: { page, page_size: 10 },
+        }
+      );
+      setFetchList(res.data);
+      setHistories((prevHistories) => {
+        const combinedHistories = [...prevHistories, ...res.data];
+        const uniqueHistories = Array.from(
+          new Map(
+            combinedHistories.map((item) => [item.signature, item])
+          ).values()
+        );
+        return uniqueHistories;
+      });
+    } catch (error) {
+      console.error("Error fetching histories:", error);
+    }
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    fetchHistories(page);
+  }, [page, fetchHistories]);
+
+  useEffect(() => {
+    setHistories((prevHistories) => {
+      const combinedHistories = [...messages, ...prevHistories];
+      const uniqueHistories = Array.from(
+        new Map(
+          combinedHistories.map((item) => [item.signature, item])
+        ).values()
+      );
+      return uniqueHistories;
+    });
+  }, [messages]);
+  console.log("fetch===", fetchList.length);
+
+  const handleScroll = (event: any) => {
+    const { scrollTop, scrollHeight, clientHeight } = event.currentTarget;
+    if (
+      scrollHeight - scrollTop === clientHeight &&
+      !loading &&
+      fetchList.length !== 0
+    ) {
+      setPage((prevPage) => prevPage + 1);
+    }
+  };
+
   return (
-    <TableContainer component={Paper} sx={{ overflow: "hidden" }}>
+    <TableContainer
+      component={Paper}
+      sx={{ overflowX: "hidden", height: 500, overflowY: "scroll" }}
+      onScroll={handleScroll}
+    >
       <Table aria-label="customized table">
         <TableHead>
           <TableRow>
-            <StyledTableCell width={50}>Address</StyledTableCell>
-            <StyledTableCell align="right">Quantity</StyledTableCell>
-            <StyledTableCell align="right">Time</StyledTableCell>
+            <StyledTableCell width={50}>Signature</StyledTableCell>
+            <StyledTableCell align="center">Address</StyledTableCell>
+            <StyledTableCell align="right">Timestamp</StyledTableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -90,18 +138,31 @@ export default function TxTable() {
                 <AddressCell>
                   <Typography
                     component={"a"}
-                    href={`https://solscan.io/account/${row.address}`}
+                    href={`https://solscan.io/tx/${row.signature}`}
                     target="_blank"
                     noWrap
                   >
-                    {row.address}
+                    {row.signature}
                   </Typography>
                 </AddressCell>
               </StyledTableCell>
-              <StyledTableCell align="right">{row.count}</StyledTableCell>
-              <StyledTableCell align="right">{row.timestamp}</StyledTableCell>
+              <StyledTableCell align="right">
+                <AddressCell>{row.address}</AddressCell>
+              </StyledTableCell>
+              <StyledTableCell align="right">
+                {formatDistanceToNow(new Date(row.timestamp), {
+                  addSuffix: true,
+                })}
+              </StyledTableCell>
             </StyledTableRow>
           ))}
+          {loading && (
+            <StyledTableRow>
+              <StyledTableCell colSpan={3} align="center">
+                Loading...
+              </StyledTableCell>
+            </StyledTableRow>
+          )}
         </TableBody>
       </Table>
     </TableContainer>

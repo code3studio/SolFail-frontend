@@ -88,13 +88,13 @@ const NFTDialog = ({ data, gift, open, handleClose }: Props) => {
                   }}
                 >
                   <Typography>{t.trait_type}</Typography>
-                  {t.trait_type === "link" ? (
+                  {t.trait_type === "signature" ? (
                     <Typography
                       component={"a"}
                       target="_blank"
                       href={`https://solscan.io/tx/${t.value}`}
                     >
-                      {t.trait_type === "link"
+                      {t.trait_type === "signature"
                         ? abbreviateString(t.value)
                         : t.value}
                     </Typography>

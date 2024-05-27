@@ -17,6 +17,7 @@ import {
 } from "@solana/wallet-adapter-wallets";
 import "@solana/wallet-adapter-react-ui/styles.css";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
+import { WebSocketProvider } from "./providers/WebSocketProvider";
 
 function App() {
   const network = WalletAdapterNetwork.Mainnet;
@@ -34,15 +35,17 @@ function App() {
   );
   return (
     <>
-      <ThemeProvider theme={theme}>
-        <WalletProvider wallets={wallets} autoConnect>
-          <WalletModalProvider>
-            <React.Suspense fallback={<p>hello</p>}>
-              <RouterProvider router={routers} />
-            </React.Suspense>
-          </WalletModalProvider>
-        </WalletProvider>
-      </ThemeProvider>
+      <WebSocketProvider url={import.meta.env.VITE_WEBSOCKET_ENDPOINT}>
+        <ThemeProvider theme={theme}>
+          <WalletProvider wallets={wallets} autoConnect>
+            <WalletModalProvider>
+              <React.Suspense fallback={<p>hello</p>}>
+                <RouterProvider router={routers} />
+              </React.Suspense>
+            </WalletModalProvider>
+          </WalletProvider>
+        </ThemeProvider>
+      </WebSocketProvider>
     </>
   );
 }

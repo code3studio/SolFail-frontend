@@ -9,6 +9,7 @@ const Dashboard = (_props: Props) => {
     <>
       {/* <Header /> */}
       <Widget1 />
+      {/* <WebSocketComponent /> */}
       {/* <Grid container spacing={4} mt={4}>
         <Grid item md={6}>
           <Widget2 />

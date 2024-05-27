@@ -1,5 +1,7 @@
-import { Divider, Paper, Typography, styled } from "@mui/material";
+import { Box, Divider, Grid, Paper, Typography, styled } from "@mui/material";
 import TxTable from "./HistoryTable";
+import { useWebSocket } from "../../../providers/WebSocketProvider";
+import { green, grey } from "@mui/material/colors";
 
 type Props = {};
 const Root = styled(Paper)(() => ({
@@ -12,9 +14,21 @@ const Root = styled(Paper)(() => ({
 }));
 
 const History = (_props: Props) => {
+  const { status } = useWebSocket();
   return (
     <Root>
-      <Typography variant="h5">Transaction History</Typography>
+      <Grid container justifyContent={"space-between"} alignItems={"center"}>
+        <Typography variant="h5">Transaction History</Typography>
+        <Box display={"flex"} alignItems={"center"}>
+          <Typography mr={2}>server status:{status}</Typography>
+          <Box
+            width={10}
+            height={10}
+            bgcolor={status === "connected" ? green[500] : grey[700]}
+            borderRadius={"50%"}
+          />
+        </Box>
+      </Grid>
       <Divider sx={{ my: 2 }} />
       <TxTable />
       {/* {histories.map((item, index) => (
