@@ -15,6 +15,7 @@ const Root = styled(Paper)(() => ({
   padding: 16,
   display: "flex",
   justifyContent: "center",
+  height: 300,
   //   width: "100%",
 
   //   width: "100%",

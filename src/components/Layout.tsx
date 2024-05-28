@@ -10,7 +10,7 @@ const Layout = ({}: Props) => {
   return (
     <div>
       <Header />
-      <Container maxWidth="xl" sx={{ mt: 32 }}>
+      <Container maxWidth="xl" sx={{ my: 32 }}>
         <Outlet />
       </Container>
     </div>

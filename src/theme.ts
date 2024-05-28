@@ -19,6 +19,9 @@ export const theme = createTheme({
     primary: {
       main: "#c74ae3",
     },
+    secondary: {
+      main: "#02E8B5",
+    },
   },
   typography: {
     caption: { fontSize: "12px" },
@@ -45,6 +48,8 @@ export const theme = createTheme({
           },
           minWidth: "0 !important",
           textTransform: "capitalize",
+          fontWeight: 600,
+          borderRadius: 8,
         },
       },
     },

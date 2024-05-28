@@ -17,7 +17,9 @@ type Props = {};
 
 const Root = styled(Paper)(() => ({
   borderRadius: 16,
-  padding: 16,
+  padding: "0px 20px",
+  // padding: 16,
+  height: "100%",
   //   width: "100%",
 
   //   width: "100%",

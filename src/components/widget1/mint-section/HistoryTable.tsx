@@ -36,6 +36,7 @@ const AddressCell = styled("div")(({ theme }) => ({
   overflow: "hidden",
   textOverflow: "ellipsis",
   whiteSpace: "nowrap",
+  fontWeight: 100,
   width: "100%",
   [theme.breakpoints.down("sm")]: {
     maxWidth: "100px", // Adjust this width as needed for small screens
@@ -116,7 +117,7 @@ export default function TxTable() {
   return (
     <TableContainer
       component={Paper}
-      sx={{ overflowX: "hidden", height: 500, overflowY: "scroll" }}
+      sx={{ overflowX: "hidden", height: 800, overflowY: "scroll" }}
       onScroll={handleScroll}
     >
       <Table aria-label="customized table">
@@ -149,7 +150,7 @@ export default function TxTable() {
               <StyledTableCell align="right">
                 <AddressCell>{row.address}</AddressCell>
               </StyledTableCell>
-              <StyledTableCell align="right">
+              <StyledTableCell align="right" style={{ fontWeight: 100 }}>
                 {formatDistanceToNow(new Date(row.timestamp), {
                   addSuffix: true,
                 })}
