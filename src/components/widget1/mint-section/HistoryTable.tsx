@@ -67,7 +67,7 @@ export default function TxTable() {
       const res = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/get_histories`,
         {
-          params: { page, page_size: 10 },
+          params: { page, page_size: 15 },
         }
       );
       setFetchList(res.data);
