@@ -1,5 +1,6 @@
 import { Box, Button, Grid, Paper, Typography, styled } from "@mui/material";
 import SwitchTab from "./switch-tab";
+import HistoryChart from "./history-chart";
 
 type Props = {};
 const Root = styled(Paper)(() => ({
@@ -28,6 +29,9 @@ const MyPoints = (_props: Props) => {
           </Grid>
           <Grid item></Grid>
         </Grid>
+        {/* <Grid container> */}
+        <HistoryChart />
+        {/* </Grid> */}
       </Box>
     </Root>
   );

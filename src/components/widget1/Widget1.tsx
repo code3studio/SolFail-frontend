@@ -3,6 +3,7 @@ import MintSection from "./mint-section/MintSection";
 import ShowSection from "./show-section";
 import History from "./mint-section/History";
 import MyPoints from "./my-points";
+import TpsChart from "./tps-chart";
 
 type Props = {};
 
@@ -26,6 +27,7 @@ const Widget1 = (_props: Props) => {
           <MyPoints />
         </Grid>
       </Grid>
+      <TpsChart />
     </>
   );
 };
